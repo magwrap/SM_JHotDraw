@@ -1581,16 +1581,9 @@ public class ButtonFactory {
 
     public static JButton createFontStyleBoldButton(DrawingEditor editor,
             ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
-        JButton btn;
-        btn = new JButton();
-        labels.configureToolBarButton(btn, "attribute.fontStyle.bold");
-        btn.setFocusable(false);
-        AbstractAction a = new AttributeToggler<>(editor,
-                FONT_BOLD, Boolean.TRUE, Boolean.FALSE,
+        return createFontStyleButton(editor, labels,
+                FONT_BOLD, "attribute.fontStyle.bold",
                 new StyledEditorKit.BoldAction());
-        a.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString("attribute.fontStyle.bold.text"));
-        btn.addActionListener(a);
-        return btn;
     }
 
     public static JButton createFontStyleItalicButton(DrawingEditor editor) {
@@ -1606,16 +1599,9 @@ public class ButtonFactory {
 
     public static JButton createFontStyleItalicButton(DrawingEditor editor,
             ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
-        JButton btn;
-        btn = new JButton();
-        labels.configureToolBarButton(btn, "attribute.fontStyle.italic");
-        btn.setFocusable(false);
-        AbstractAction a = new AttributeToggler<>(editor,
-                FONT_ITALIC, Boolean.TRUE, Boolean.FALSE,
+        return createFontStyleButton(editor, labels,
+                FONT_ITALIC, "attribute.fontStyle.italic",
                 new StyledEditorKit.BoldAction());
-        a.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString("attribute.fontStyle.italic.text"));
-        btn.addActionListener(a);
-        return btn;
     }
 
     public static JButton createFontStyleUnderlineButton(DrawingEditor editor) {
@@ -1631,14 +1617,23 @@ public class ButtonFactory {
 
     public static JButton createFontStyleUnderlineButton(DrawingEditor editor,
             ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
-        JButton btn;
-        btn = new JButton();
-        labels.configureToolBarButton(btn, "attribute.fontStyle.underline");
+        return createFontStyleButton(editor, labels,
+                FONT_UNDERLINE, "attribute.fontStyle.underline",
+                new StyledEditorKit.BoldAction());
+    }
+
+    private static JButton createFontStyleButton(DrawingEditor editor,
+            ResourceBundleUtil labels,
+            AttributeKey<Boolean> key,
+            String labelKey,
+            Action compatibleTextAction) {
+        JButton btn = new JButton();
+        labels.configureToolBarButton(btn, labelKey);
         btn.setFocusable(false);
         AbstractAction a = new AttributeToggler<>(editor,
-                FONT_UNDERLINE, Boolean.TRUE, Boolean.FALSE,
-                new StyledEditorKit.BoldAction());
-        a.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString("attribute.fontStyle.underline.text"));
+                key, Boolean.TRUE, Boolean.FALSE,
+                compatibleTextAction);
+        a.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString(labelKey + ".text"));
         btn.addActionListener(a);
         return btn;
     }
