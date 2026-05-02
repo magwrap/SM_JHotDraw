@@ -23,6 +23,7 @@ import org.jhotdraw.draw.action.*;
 import org.jhotdraw.draw.tool.CreationTool;
 import org.jhotdraw.draw.tool.TextAreaCreationTool;
 import org.jhotdraw.draw.tool.TextCreationTool;
+import org.jhotdraw.draw.figure.BezierFigure;
 import org.jhotdraw.gui.action.ButtonFactory;
 import org.jhotdraw.gui.plaf.palette.PaletteButtonUI;
 import org.jhotdraw.samples.svg.PathTool;
@@ -166,6 +167,13 @@ public class ToolsToolBar extends AbstractToolBar {
                 gbc.gridx = 2;
                 gbc.gridy = 2;
                 gbc.insets = new Insets(3, 3, 0, 0);
+                p.add(btn, gbc);
+                btn = ButtonFactory.addToolTo(this, editor, new org.jhotdraw.draw.tool.PathTool(new BezierFigure()), "edit.createPath", labels);
+                btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
+                gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 3;
+                gbc.insets = new Insets(3, 0, 0, 0);
                 p.add(btn, gbc);
             break;
         }
