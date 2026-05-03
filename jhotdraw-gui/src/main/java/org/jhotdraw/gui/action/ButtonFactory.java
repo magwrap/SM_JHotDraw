@@ -53,6 +53,8 @@ import static org.jhotdraw.draw.AttributeKeys.FILL_UNDER_STROKE;
 import static org.jhotdraw.draw.AttributeKeys.FONT_BOLD;
 import static org.jhotdraw.draw.AttributeKeys.FONT_FACE;
 import static org.jhotdraw.draw.AttributeKeys.FONT_ITALIC;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUBSCRIPT;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUPERSCRIPT;
 import static org.jhotdraw.draw.AttributeKeys.FONT_UNDERLINE;
 import static org.jhotdraw.draw.AttributeKeys.START_DECORATION;
 import static org.jhotdraw.draw.AttributeKeys.STROKE_CAP;
@@ -1534,6 +1536,8 @@ public class ButtonFactory {
         bar.add(createFontStyleBoldButton(editor));
         bar.add(createFontStyleItalicButton(editor));
         bar.add(createFontStyleUnderlineButton(editor));
+        bar.add(createFontStyleSuperscriptButton(editor));
+        bar.add(createFontStyleSubscriptButton(editor));
     }
 
     public static JPopupButton createFontButton(DrawingEditor editor) {
@@ -1620,6 +1624,42 @@ public class ButtonFactory {
         return createFontStyleButton(editor, labels,
                 FONT_UNDERLINE, "attribute.fontStyle.underline",
                 new StyledEditorKit.BoldAction());
+    }
+
+    public static JButton createFontStyleSuperscriptButton(DrawingEditor editor) {
+        return createFontStyleSuperscriptButton(editor,
+                ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels"));
+    }
+
+    public static JButton createFontStyleSuperscriptButton(DrawingEditor editor,
+            ResourceBundleUtil labels) {
+        return createFontStyleSuperscriptButton(editor,
+                labels, new LinkedList<>());
+    }
+
+    public static JButton createFontStyleSuperscriptButton(DrawingEditor editor,
+            ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
+        return createFontStyleButton(editor, labels,
+                FONT_SUPERSCRIPT, "attribute.fontStyle.superscript",
+                null);
+    }
+
+    public static JButton createFontStyleSubscriptButton(DrawingEditor editor) {
+        return createFontStyleSubscriptButton(editor,
+                ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels"));
+    }
+
+    public static JButton createFontStyleSubscriptButton(DrawingEditor editor,
+            ResourceBundleUtil labels) {
+        return createFontStyleSubscriptButton(editor,
+                labels, new LinkedList<>());
+    }
+
+    public static JButton createFontStyleSubscriptButton(DrawingEditor editor,
+            ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
+        return createFontStyleButton(editor, labels,
+                FONT_SUBSCRIPT, "attribute.fontStyle.subscript",
+                null);
     }
 
     private static JButton createFontStyleButton(DrawingEditor editor,
