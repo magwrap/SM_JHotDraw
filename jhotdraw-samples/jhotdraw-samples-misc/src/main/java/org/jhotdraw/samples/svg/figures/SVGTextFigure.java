@@ -15,6 +15,8 @@ import java.util.*;
 import org.jhotdraw.draw.*;
 import static org.jhotdraw.draw.AttributeKeys.FILL_COLOR;
 import static org.jhotdraw.draw.AttributeKeys.FONT_SIZE;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUBSCRIPT;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUPERSCRIPT;
 import static org.jhotdraw.draw.AttributeKeys.FONT_UNDERLINE;
 import static org.jhotdraw.draw.AttributeKeys.TEXT;
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
@@ -126,6 +128,7 @@ public class SVGTextFigure
             if (get(FONT_UNDERLINE)) {
                 textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
             }
+            applySuperscriptAttribute(textAttributes);
             TextLayout textLayout = new TextLayout(text, textAttributes, frc);
             cachedBounds.setRect(coordinates[0].x, coordinates[0].y - textLayout.getAscent(), textLayout.getAdvance(), textLayout.getAscent());
             AffineTransform tx = new AffineTransform();
@@ -191,6 +194,7 @@ public class SVGTextFigure
             if (get(FONT_UNDERLINE)) {
                 textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
             }
+            applySuperscriptAttribute(textAttributes);
             TextLayout textLayout = new TextLayout(text, textAttributes, frc);
             AffineTransform tx = new AffineTransform();
             tx.translate(coordinates[0].x, coordinates[0].y);
@@ -300,6 +304,8 @@ public class SVGTextFigure
                 || key.equals(SVGAttributeKeys.FONT_FACE)
                 || key.equals(SVGAttributeKeys.FONT_BOLD)
                 || key.equals(SVGAttributeKeys.FONT_ITALIC)
+                || key.equals(FONT_SUPERSCRIPT)
+                || key.equals(FONT_SUBSCRIPT)
                 || key.equals(SVGAttributeKeys.FONT_SIZE)) {
             invalidate();
         }
@@ -317,6 +323,14 @@ public class SVGTextFigure
     @Override
     public boolean isEditable() {
         return editable;
+    }
+
+    private void applySuperscriptAttribute(HashMap<TextAttribute, Object> textAttributes) {
+        if (get(FONT_SUPERSCRIPT)) {
+            textAttributes.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
+        } else if (get(FONT_SUBSCRIPT)) {
+            textAttributes.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUB);
+        }
     }
 
     public void setEditable(boolean b) {

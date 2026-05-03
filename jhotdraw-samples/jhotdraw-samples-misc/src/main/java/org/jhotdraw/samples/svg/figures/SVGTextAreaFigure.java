@@ -16,6 +16,8 @@ import java.util.*;
 import org.jhotdraw.draw.*;
 import static org.jhotdraw.draw.AttributeKeys.FILL_COLOR;
 import static org.jhotdraw.draw.AttributeKeys.FONT_SIZE;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUBSCRIPT;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUPERSCRIPT;
 import static org.jhotdraw.draw.AttributeKeys.FONT_UNDERLINE;
 import static org.jhotdraw.draw.AttributeKeys.STROKE_COLOR;
 import static org.jhotdraw.draw.AttributeKeys.STROKE_WIDTH;
@@ -132,6 +134,7 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
             if (getText() != null || isEditable()) {
                 Font font = getFont();
                 boolean isUnderlined = get(FONT_UNDERLINE);
+                Integer superscript = getSuperscriptAttribute();
                 Insets2D.Double insets = getInsets();
                 Rectangle2D.Double textRect = new Rectangle2D.Double(
                         bounds.x + insets.left,
@@ -158,6 +161,9 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
                             as.addAttribute(TextAttribute.FONT, font);
                             if (isUnderlined) {
                                 as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
+                            }
+                            if (superscript != null) {
+                                as.addAttribute(TextAttribute.SUPERSCRIPT, superscript);
                             }
                             int tabCount = paragraphs[i].split("\t").length - 1;
                             Rectangle2D.Double paragraphBounds = appendParagraph(
@@ -374,6 +380,8 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
                 || key.equals(SVGAttributeKeys.FONT_FACE)
                 || key.equals(SVGAttributeKeys.FONT_BOLD)
                 || key.equals(SVGAttributeKeys.FONT_ITALIC)
+                || key.equals(FONT_SUPERSCRIPT)
+                || key.equals(FONT_SUBSCRIPT)
                 || key.equals(SVGAttributeKeys.FONT_SIZE)
                 || key.equals(SVGAttributeKeys.STROKE_WIDTH)
                 || key.equals(SVGAttributeKeys.STROKE_COLOR)
@@ -558,6 +566,7 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
         if (getText() != null) {
             Font font = getFont();
             boolean isUnderlined = get(FONT_UNDERLINE);
+            Integer superscript = getSuperscriptAttribute();
             float leftMargin = 0;
             float rightMargin = (float) maxWidth - 1;
             float verticalPos = 0;
@@ -579,6 +588,9 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
                         if (isUnderlined) {
                             as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
                         }
+                        if (superscript != null) {
+                            as.addAttribute(TextAttribute.SUPERSCRIPT, superscript);
+                        }
                         int tabCount = paragraphs[i].split("\t").length - 1;
                         Rectangle2D.Double paragraphBounds = appendParagraph(null, as.getIterator(), verticalPos, maxVerticalPos, leftMargin, rightMargin, tabStops, tabCount);
                         verticalPos = (float) (paragraphBounds.y + paragraphBounds.height);
@@ -595,5 +607,14 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
         SVGTextAreaFigure that = (SVGTextAreaFigure) super.clone();
         that.bounds = (Rectangle2D.Double) this.bounds.clone();
         return that;
+    }
+
+    private Integer getSuperscriptAttribute() {
+        if (get(FONT_SUPERSCRIPT)) {
+            return TextAttribute.SUPERSCRIPT_SUPER;
+        } else if (get(FONT_SUBSCRIPT)) {
+            return TextAttribute.SUPERSCRIPT_SUB;
+        }
+        return null;
     }
 }

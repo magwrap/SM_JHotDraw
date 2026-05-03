@@ -85,6 +85,7 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         if (getText() != null || isEditable()) {
             Font font = getFont();
             boolean isUnderlined = get(FONT_UNDERLINE);
+            Integer superscript = getSuperscriptAttribute();
             Insets2D.Double insets = getInsets();
             Rectangle2D.Double textRect = new Rectangle2D.Double(
                     bounds.x + insets.left,
@@ -114,6 +115,9 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
                         as.addAttribute(TextAttribute.FONT, font);
                         if (isUnderlined) {
                             as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
+                        }
+                        if (superscript != null) {
+                            as.addAttribute(TextAttribute.SUPERSCRIPT, superscript);
                         }
                         int tabCount = paragraphs[i].split("\t").length - 1;
                         Rectangle2D.Double paragraphBounds = drawParagraph(g, as.getIterator(), verticalPos, maxVerticalPos, leftMargin, rightMargin, tabStops, tabCount);
@@ -479,6 +483,7 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         if (getText() != null) {
             Font font = getFont();
             boolean isUnderlined = get(FONT_UNDERLINE);
+            Integer superscript = getSuperscriptAttribute();
             float leftMargin = 0;
             float rightMargin = (float) maxWidth - 1;
             float verticalPos = 0;
@@ -499,6 +504,9 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
                     if (isUnderlined) {
                         as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
                     }
+                    if (superscript != null) {
+                        as.addAttribute(TextAttribute.SUPERSCRIPT, superscript);
+                    }
                     int tabCount = paragraphs[i].split("\t").length - 1;
                     Rectangle2D.Double paragraphBounds = drawParagraph(null, as.getIterator(), verticalPos, maxVerticalPos, leftMargin, rightMargin, tabStops, tabCount);
                     verticalPos = (float) (paragraphBounds.y + paragraphBounds.height);
@@ -507,5 +515,14 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
             }
         }
         return new Dimension2DDouble(-Math.min(textRect.x, 0) + textRect.width, -Math.min(textRect.y, 0) + textRect.height);
+    }
+
+    private Integer getSuperscriptAttribute() {
+        if (get(FONT_SUPERSCRIPT)) {
+            return TextAttribute.SUPERSCRIPT_SUPER;
+        } else if (get(FONT_SUBSCRIPT)) {
+            return TextAttribute.SUPERSCRIPT_SUB;
+        }
+        return null;
     }
 }
