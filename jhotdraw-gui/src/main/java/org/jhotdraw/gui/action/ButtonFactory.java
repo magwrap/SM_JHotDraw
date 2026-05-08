@@ -101,6 +101,7 @@ import org.jhotdraw.draw.event.SelectionComponentRepainter;
 import org.jhotdraw.draw.event.ToolAdapter;
 import org.jhotdraw.draw.event.ToolEvent;
 import org.jhotdraw.draw.event.ToolListener;
+import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.draw.tool.DelegationSelectionTool;
 import org.jhotdraw.draw.tool.Tool;
 import org.jhotdraw.geom.DoubleStroke;
@@ -1639,9 +1640,9 @@ public class ButtonFactory {
 
     public static JButton createFontStyleSuperscriptButton(DrawingEditor editor,
             ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
-        return createFontStyleButton(editor, labels,
-                FONT_SUPERSCRIPT, "attribute.fontStyle.superscript",
-                null);
+        return createFontPositionButton(editor, labels,
+                FONT_SUPERSCRIPT, FONT_SUBSCRIPT,
+                "attribute.fontStyle.superscript");
     }
 
     public static JButton createFontStyleSubscriptButton(DrawingEditor editor) {
@@ -1657,9 +1658,46 @@ public class ButtonFactory {
 
     public static JButton createFontStyleSubscriptButton(DrawingEditor editor,
             ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
-        return createFontStyleButton(editor, labels,
-                FONT_SUBSCRIPT, "attribute.fontStyle.subscript",
-                null);
+        return createFontPositionButton(editor, labels,
+                FONT_SUBSCRIPT, FONT_SUPERSCRIPT,
+                "attribute.fontStyle.subscript");
+    }
+
+    private static JButton createFontPositionButton(final DrawingEditor editor,
+            final ResourceBundleUtil labels,
+            final AttributeKey<Boolean> key,
+            final AttributeKey<Boolean> oppositeKey,
+            final String labelKey) {
+        JButton btn = new JButton();
+        labels.configureToolBarButton(btn, labelKey);
+        btn.setFocusable(false);
+        AbstractAction a = new AbstractAction() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                HashMap<AttributeKey<?>, Object> attributes = new HashMap<>();
+                attributes.put(key, !isAttributeActive(editor, key));
+                attributes.put(oppositeKey, Boolean.FALSE);
+                AttributeAction action = new AttributeAction(editor,
+                        attributes,
+                        labels.getString(labelKey + ".text"),
+                        null);
+                action.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString(labelKey + ".text"));
+                action.actionPerformed(evt);
+            }
+        };
+        btn.addActionListener(a);
+        return btn;
+    }
+
+    private static boolean isAttributeActive(DrawingEditor editor, AttributeKey<Boolean> key) {
+        DrawingView view = editor.getActiveView();
+        if (view != null && !view.getSelectedFigures().isEmpty()) {
+            Figure figure = view.getSelectedFigures().iterator().next();
+            return Boolean.TRUE.equals(figure.get(key));
+        }
+        return Boolean.TRUE.equals(editor.getDefaultAttribute(key));
     }
 
     private static JButton createFontStyleButton(DrawingEditor editor,
