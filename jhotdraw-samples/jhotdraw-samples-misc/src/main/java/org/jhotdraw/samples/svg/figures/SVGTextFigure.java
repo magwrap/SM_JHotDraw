@@ -124,13 +124,13 @@ public class SVGTextFigure
             }
             FontRenderContext frc = getFontRenderContext();
             HashMap<TextAttribute, Object> textAttributes = new HashMap<TextAttribute, Object>();
-            textAttributes.put(TextAttribute.FONT, getFont());
+            textAttributes.put(TextAttribute.FONT, AttributeKeys.getPositionedFont(this));
             if (get(FONT_UNDERLINE)) {
                 textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
             }
-            applySuperscriptAttribute(textAttributes);
             TextLayout textLayout = new TextLayout(text, textAttributes, frc);
-            cachedBounds.setRect(coordinates[0].x, coordinates[0].y - textLayout.getAscent(), textLayout.getAdvance(), textLayout.getAscent());
+            float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
+            cachedBounds.setRect(coordinates[0].x, coordinates[0].y - textLayout.getAscent() + baselineOffset, textLayout.getAdvance(), textLayout.getAscent() + Math.abs(baselineOffset));
             AffineTransform tx = new AffineTransform();
             tx.translate(coordinates[0].x, coordinates[0].y);
             switch (get(TEXT_ANCHOR)) {
@@ -190,14 +190,13 @@ public class SVGTextFigure
             }
             FontRenderContext frc = getFontRenderContext();
             HashMap<TextAttribute, Object> textAttributes = new HashMap<TextAttribute, Object>();
-            textAttributes.put(TextAttribute.FONT, getFont());
+            textAttributes.put(TextAttribute.FONT, AttributeKeys.getPositionedFont(this));
             if (get(FONT_UNDERLINE)) {
                 textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
             }
-            applySuperscriptAttribute(textAttributes);
             TextLayout textLayout = new TextLayout(text, textAttributes, frc);
             AffineTransform tx = new AffineTransform();
-            tx.translate(coordinates[0].x, coordinates[0].y);
+            tx.translate(coordinates[0].x, coordinates[0].y + AttributeKeys.getFontBaselineOffset(this));
             switch (get(TEXT_ANCHOR)) {
                 case END:
                     tx.translate(-textLayout.getAdvance(), 0);
@@ -323,14 +322,6 @@ public class SVGTextFigure
     @Override
     public boolean isEditable() {
         return editable;
-    }
-
-    private void applySuperscriptAttribute(HashMap<TextAttribute, Object> textAttributes) {
-        if (get(FONT_SUPERSCRIPT)) {
-            textAttributes.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
-        } else if (get(FONT_SUBSCRIPT)) {
-            textAttributes.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUB);
-        }
     }
 
     public void setEditable(boolean b) {

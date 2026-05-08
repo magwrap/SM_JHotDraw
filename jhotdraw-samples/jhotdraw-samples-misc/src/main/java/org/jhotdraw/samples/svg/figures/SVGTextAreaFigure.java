@@ -132,9 +132,9 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
             Path2D.Double shape;
             cachedTextShape = shape = new Path2D.Double();
             if (getText() != null || isEditable()) {
-                Font font = getFont();
+                Font font = AttributeKeys.getPositionedFont(this);
                 boolean isUnderlined = get(FONT_UNDERLINE);
-                Integer superscript = getSuperscriptAttribute();
+                float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
                 Insets2D.Double insets = getInsets();
                 Rectangle2D.Double textRect = new Rectangle2D.Double(
                         bounds.x + insets.left,
@@ -143,7 +143,7 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
                         bounds.height - insets.top - insets.bottom);
                 float leftMargin = (float) textRect.x;
                 float rightMargin = (float) Math.max(leftMargin + 1, textRect.x + textRect.width);
-                float verticalPos = (float) textRect.y;
+                float verticalPos = (float) textRect.y + baselineOffset;
                 float maxVerticalPos = (float) (textRect.y + textRect.height);
                 if (leftMargin < rightMargin) {
                     float tabWidth = (float) (getTabSize() * font.getStringBounds("m", getFontRenderContext()).getWidth());
@@ -161,9 +161,6 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
                             as.addAttribute(TextAttribute.FONT, font);
                             if (isUnderlined) {
                                 as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
-                            }
-                            if (superscript != null) {
-                                as.addAttribute(TextAttribute.SUPERSCRIPT, superscript);
                             }
                             int tabCount = paragraphs[i].split("\t").length - 1;
                             Rectangle2D.Double paragraphBounds = appendParagraph(
@@ -564,12 +561,12 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
     public Dimension2DDouble getPreferredTextSize(double maxWidth) {
         Rectangle2D.Double textRect = new Rectangle2D.Double();
         if (getText() != null) {
-            Font font = getFont();
+            Font font = AttributeKeys.getPositionedFont(this);
             boolean isUnderlined = get(FONT_UNDERLINE);
-            Integer superscript = getSuperscriptAttribute();
+            float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
             float leftMargin = 0;
             float rightMargin = (float) maxWidth - 1;
-            float verticalPos = 0;
+            float verticalPos = baselineOffset;
             float maxVerticalPos = Float.MAX_VALUE;
             if (leftMargin < rightMargin) {
                 float tabWidth = (float) (getTabSize() * font.getStringBounds("m", getFontRenderContext()).getWidth());
@@ -587,9 +584,6 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
                         as.addAttribute(TextAttribute.FONT, font);
                         if (isUnderlined) {
                             as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
-                        }
-                        if (superscript != null) {
-                            as.addAttribute(TextAttribute.SUPERSCRIPT, superscript);
                         }
                         int tabCount = paragraphs[i].split("\t").length - 1;
                         Rectangle2D.Double paragraphBounds = appendParagraph(null, as.getIterator(), verticalPos, maxVerticalPos, leftMargin, rightMargin, tabStops, tabCount);
@@ -609,12 +603,4 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
         return that;
     }
 
-    private Integer getSuperscriptAttribute() {
-        if (get(FONT_SUPERSCRIPT)) {
-            return TextAttribute.SUPERSCRIPT_SUPER;
-        } else if (get(FONT_SUBSCRIPT)) {
-            return TextAttribute.SUPERSCRIPT_SUB;
-        }
-        return null;
-    }
 }

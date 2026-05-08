@@ -527,6 +527,24 @@ public class AttributeKeys {
         }
     }
 
+    public static Font getPositionedFont(Figure f) {
+        Font font = getFont(f);
+        if (font != null && (f.get(FONT_SUPERSCRIPT) || f.get(FONT_SUBSCRIPT))) {
+            font = font.deriveFont(font.getSize2D() * 0.7f);
+        }
+        return font;
+    }
+
+    public static float getFontBaselineOffset(Figure f) {
+        float fontSize = f.get(FONT_SIZE).floatValue();
+        if (f.get(FONT_SUPERSCRIPT)) {
+            return -fontSize * 0.35f;
+        } else if (f.get(FONT_SUBSCRIPT)) {
+            return fontSize * 0.25f;
+        }
+        return 0f;
+    }
+
     public static int getFontStyle(Figure f) {
         int style = Font.PLAIN;
         if (f.get(FONT_BOLD)) {
