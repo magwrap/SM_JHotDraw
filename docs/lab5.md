@@ -13,7 +13,7 @@ This lab actualizes the change request from the earlier concept location and imp
 | Attribute model | Added `FONT_SUPERSCRIPT` and `FONT_SUBSCRIPT` to `AttributeKeys` and registered them in `SUPPORTED_ATTRIBUTES`. |
 | Generic toolbar | Added `createFontStyleSuperscriptButton` and `createFontStyleSubscriptButton` to `ButtonFactory`. |
 | SVG toolbar | Added subscript and superscript buttons to both disclosed states of `FontToolBar`. |
-| Rendering | Applied `TextAttribute.SUPERSCRIPT` in `TextFigure`, `TextAreaFigure`, `SVGTextFigure`, and `SVGTextAreaFigure`. |
+| Rendering | Applied explicit font size scaling (×0.7) and vertical baseline offset in `TextFigure`, `TextAreaFigure`, `SVGTextFigure`, and `SVGTextAreaFigure`. |
 | Labels | Added text and tooltip labels for the new controls. |
 
 The implementation intentionally keeps the scope small. It adds UI and rendering support for selected figures, but does not extend SVG import/export persistence. That can be handled as a separate change if saving the formatting in SVG files becomes required.
@@ -26,6 +26,8 @@ The implementation intentionally keeps the scope small. It adds UI and rendering
 | 2 | Updated renderers so the stored attributes change the visible text baseline. |
 | 3 | Added toolbar buttons so users can toggle the attributes from the font palette. |
 | 4 | Added documentation explaining the design and scope of the actualized change. |
+| 5 | Replaced `TextAttribute.SUPERSCRIPT` with explicit font size scaling + baseline offset because `TextAttribute.SUPERSCRIPT` has no visible effect when applied to an entire text figure. |
+| 6 | Made Sup and Sub buttons mutually exclusive so clicking one clears the other. |
 
 This follows the impact path identified in Lab 3: model attributes first, then rendering, then toolbar integration.
 
@@ -34,7 +36,7 @@ This follows the impact path identified in Lab 3: model attributes first, then r
 | Principle | Application in this change |
 | --- | --- |
 | Single Responsibility | `AttributeKeys` defines shared figure attributes, renderers translate attributes into drawing behavior, and toolbar classes expose UI controls. The change keeps these responsibilities separate. |
-| Open/Closed | The existing font style button creation was extended by adding new factory methods that reuse the Lab 4 helper, instead of rewriting existing bold, italic, or underline behavior. |
+| Open/Closed | The existing font style button creation was extended with a private `createFontPositionButton` method that handles mutual exclusivity, instead of modifying the existing bold/italic/underline helpers. |
 | Liskov Substitution | The new attributes are normal `AttributeKey<Boolean>` values and do not change the expected behavior of existing figure types. Existing text figures remain usable through the same interfaces. |
 | Interface Segregation | No new methods were added to broad figure interfaces. The feature uses the existing attribute mechanism instead of forcing every figure interface to know about subscript and superscript. |
 | Dependency Inversion | Toolbar actions depend on the abstract `DrawingEditor` and attribute system, not concrete text figure implementations. Rendering classes consume attributes from the figure model. |
@@ -48,7 +50,7 @@ The implementation keeps the dependency direction consistent with the existing J
 | Core model | `AttributeKeys` defines the font-position state independently from UI classes. |
 | Application/action layer | `AttributeToggler` and `ButtonFactory` connect user actions to attribute updates. |
 | Interface/UI layer | `FontToolBar` exposes the new controls in the SVG sample palette. |
-| Rendering/infrastructure layer | Text figure classes translate the stored state into Java2D `TextAttribute` values. |
+| Rendering/infrastructure layer | Text figure classes translate the stored state into font size scaling and vertical baseline shift. |
 
 The toolbar does not directly manipulate rendering internals. It toggles attributes through the existing action mechanism. The renderers do not depend on toolbar classes; they only read attributes from figures. This keeps the change localized and avoids coupling UI controls to drawing implementation details.
 
@@ -61,3 +63,18 @@ mvn -B -s .maven-settings.xml -DskipTests compile
 ```
 
 The compile phase succeeds. Full test execution is not used as the main verification for this lab because the repository already has a known Surefire/JGiven test execution failure unrelated to this change.
+
+Two follow-up fixes were needed after the initial implementation:
+
+| Fix | Commit | Rationale |
+| --- | --- | --- |
+| Render sup/sub visibly | `0f58b2b8` | `TextAttribute.SUPERSCRIPT` produces no visible effect when applied to an entire figure's font; replaced with explicit font size scaling (×0.7) + vertical baseline offset. |
+| Mutual exclusivity | `f2436f20` | Sup and Sub should not be active simultaneously; added `createFontPositionButton` helper that toggles one attribute while forcing the opposite to `false`. |
+
+Before testing the application, rebuilt all modules with:
+
+```sh
+mvn -B -s .maven-settings.xml -DskipTests install
+```
+
+All modules compile successfully.
