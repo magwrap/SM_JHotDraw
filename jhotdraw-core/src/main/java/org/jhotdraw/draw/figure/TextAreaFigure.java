@@ -245,11 +245,16 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         }
     }
 
-    private void applyAlignment(Graphics2D g, List<TextLayout> layouts, List<Float> penPositions, float leftMargin, float rightMargin) {
+    private void applyAlignment(TextAlignment alignment, List<TextLayout> layouts, List<Float> penPositions, float leftMargin, float rightMargin) {
         int first = 0;
-        if (first == layouts.size() - 1 && g != null) {
-            TextAlignment alignment = getTextAlignment();
+        if (first == layouts.size() - 1) {
             penPositions.set(first, alignment.align(layouts.get(first), leftMargin, rightMargin));
+        }
+    }
+
+    private void applyAlignment(Graphics2D g, List<TextLayout> layouts, List<Float> penPositions, float leftMargin, float rightMargin) {
+        if (g != null) {
+            applyAlignment(getTextAlignment(), layouts, penPositions, leftMargin, rightMargin);
         }
     }
 
