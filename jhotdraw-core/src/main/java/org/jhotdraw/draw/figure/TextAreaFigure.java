@@ -243,9 +243,6 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
                 case CENTER:
                     penPositions.set(first, (rightMargin - 1 - leftMargin - layouts.get(first).getVisibleAdvance()) / 2 + leftMargin);
                     break;
-                case BLOCK:
-                    // not supported
-                    break;
                 case LEADING:
                 default:
                     break;
@@ -267,6 +264,31 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
                     layoutBounds.getY() + verticalPos,
                     layoutBounds.getWidth(),
                     layoutBounds.getHeight()));
+        }
+    }
+
+    private interface TextAlignment {
+        float align(TextLayout layout, float leftMargin, float rightMargin);
+    }
+
+    private static class LeadingAlignment implements TextAlignment {
+        @Override
+        public float align(TextLayout layout, float leftMargin, float rightMargin) {
+            return leftMargin;
+        }
+    }
+
+    private static class TrailingAlignment implements TextAlignment {
+        @Override
+        public float align(TextLayout layout, float leftMargin, float rightMargin) {
+            return rightMargin - layout.getVisibleAdvance() - 1;
+        }
+    }
+
+    private static class CenterAlignment implements TextAlignment {
+        @Override
+        public float align(TextLayout layout, float leftMargin, float rightMargin) {
+            return (rightMargin - 1 - leftMargin - layout.getVisibleAdvance()) / 2 + leftMargin;
         }
     }
 
