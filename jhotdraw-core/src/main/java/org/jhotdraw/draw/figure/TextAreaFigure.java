@@ -154,7 +154,10 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
                 && verticalPos <= maxVerticalPos) {
             LineLayoutResult result = layoutLines(measurer, leftMargin, rightMargin, tabStops, tabLocations, verticalPos, maxVerticalPos, currentTab);
             currentTab = result.currentTab;
-            applyAlignment(g, result.layouts, result.penPositions, leftMargin, rightMargin);
+            if (g != null) {
+                TextAlignment alignment = getTextAlignment();
+                applyAlignment(alignment, result.layouts, result.penPositions, leftMargin, rightMargin);
+            }
             verticalPos += result.maxAscent;
             renderOrMeasureLine(g, result.layouts, result.penPositions, verticalPos, paragraphBounds);
             verticalPos += result.maxDescent;
@@ -249,12 +252,6 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         int first = 0;
         if (first == layouts.size() - 1) {
             penPositions.set(first, alignment.align(layouts.get(first), leftMargin, rightMargin));
-        }
-    }
-
-    private void applyAlignment(Graphics2D g, List<TextLayout> layouts, List<Float> penPositions, float leftMargin, float rightMargin) {
-        if (g != null) {
-            applyAlignment(getTextAlignment(), layouts, penPositions, leftMargin, rightMargin);
         }
     }
 
