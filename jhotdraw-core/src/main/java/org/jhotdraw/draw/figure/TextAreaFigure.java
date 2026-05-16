@@ -233,20 +233,23 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         return new LineLayoutResult(layouts, penPositions, maxAscent, maxDescent, currentTab);
     }
 
+    private TextAlignment getTextAlignment() {
+        switch (get(TEXT_ALIGNMENT)) {
+            case TRAILING:
+                return new TrailingAlignment();
+            case CENTER:
+                return new CenterAlignment();
+            case LEADING:
+            default:
+                return new LeadingAlignment();
+        }
+    }
+
     private void applyAlignment(Graphics2D g, List<TextLayout> layouts, List<Float> penPositions, float leftMargin, float rightMargin) {
         int first = 0;
         if (first == layouts.size() - 1 && g != null) {
-            switch (get(TEXT_ALIGNMENT)) {
-                case TRAILING:
-                    penPositions.set(first, rightMargin - layouts.get(first).getVisibleAdvance() - 1);
-                    break;
-                case CENTER:
-                    penPositions.set(first, (rightMargin - 1 - leftMargin - layouts.get(first).getVisibleAdvance()) / 2 + leftMargin);
-                    break;
-                case LEADING:
-                default:
-                    break;
-            }
+            TextAlignment alignment = getTextAlignment();
+            penPositions.set(first, alignment.align(layouts.get(first), leftMargin, rightMargin));
         }
     }
 
