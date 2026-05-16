@@ -254,6 +254,114 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         return paragraphBounds;
     }
 
+    private static class LineLayoutResult {
+        final List<TextLayout> layouts;
+        final List<Float> penPositions;
+        final float maxAscent;
+        final float maxDescent;
+        final int currentTab;
+
+        LineLayoutResult(List<TextLayout> layouts, List<Float> penPositions, float maxAscent, float maxDescent, int currentTab) {
+            this.layouts = layouts;
+            this.penPositions = penPositions;
+            this.maxAscent = maxAscent;
+            this.maxDescent = maxDescent;
+            this.currentTab = currentTab;
+        }
+    }
+
+    private int[] extractTabLocations(AttributedCharacterIterator styledText, int tabCount) {
+        int[] tabLocations = new int[tabCount + 1];
+        int i = 0;
+        for (char c = styledText.first(); c != AttributedCharacterIterator.DONE; c = styledText.next()) {
+            if (c == '\t') {
+                tabLocations[i++] = styledText.getIndex();
+            }
+        }
+        tabLocations[tabCount] = styledText.getEndIndex() - 1;
+        return tabLocations;
+    }
+
+    private LineLayoutResult layoutLines(LineBreakMeasurer measurer, float leftMargin, float rightMargin, float[] tabStops, int[] tabLocations, float verticalPos, float maxVerticalPos, int currentTab) {
+        boolean lineContainsText = false;
+        boolean lineComplete = false;
+        float maxAscent = 0, maxDescent = 0;
+        float horizontalPos = leftMargin;
+        LinkedList<TextLayout> layouts = new LinkedList<>();
+        LinkedList<Float> penPositions = new LinkedList<>();
+        int endIndex = tabLocations[tabLocations.length - 1] + 1;
+        while (!lineComplete && verticalPos <= maxVerticalPos) {
+            float wrappingWidth = rightMargin - horizontalPos;
+            TextLayout layout = null;
+            layout = measurer.nextLayout(wrappingWidth,
+                    tabLocations[currentTab] + 1,
+                    lineContainsText);
+            if (layout != null) {
+                layouts.add(layout);
+                penPositions.add(horizontalPos);
+                horizontalPos += layout.getAdvance();
+                maxAscent = Math.max(maxAscent, layout.getAscent());
+                maxDescent = Math.max(maxDescent,
+                        layout.getDescent() + layout.getLeading());
+            } else {
+                lineComplete = true;
+            }
+            lineContainsText = true;
+            if (measurer.getPosition() == tabLocations[currentTab] + 1) {
+                currentTab++;
+            }
+            if (measurer.getPosition() == endIndex) {
+                lineComplete = true;
+            } else if (tabStops.length == 0 || horizontalPos >= tabStops[tabStops.length - 1]) {
+                lineComplete = true;
+            }
+            if (!lineComplete) {
+                int j;
+                for (j = 0; horizontalPos >= tabStops[j]; j++) {
+                }
+                horizontalPos = tabStops[j];
+            }
+        }
+        return new LineLayoutResult(layouts, penPositions, maxAscent, maxDescent, currentTab);
+    }
+
+    private void applyAlignment(Graphics2D g, List<TextLayout> layouts, List<Float> penPositions, float leftMargin, float rightMargin) {
+        int first = 0;
+        if (first == layouts.size() - 1 && g != null) {
+            switch (get(TEXT_ALIGNMENT)) {
+                case TRAILING:
+                    penPositions.set(first, rightMargin - layouts.get(first).getVisibleAdvance() - 1);
+                    break;
+                case CENTER:
+                    penPositions.set(first, (rightMargin - 1 - leftMargin - layouts.get(first).getVisibleAdvance()) / 2 + leftMargin);
+                    break;
+                case BLOCK:
+                    // not supported
+                    break;
+                case LEADING:
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void renderOrMeasureLine(Graphics2D g, List<TextLayout> layouts, List<Float> penPositions, float verticalPos, Rectangle2D.Double paragraphBounds) {
+        Iterator<TextLayout> layoutEnum = layouts.iterator();
+        Iterator<Float> positionEnum = penPositions.iterator();
+        while (layoutEnum.hasNext()) {
+            TextLayout nextLayout = layoutEnum.next();
+            float nextPosition = positionEnum.next();
+            if (g != null) {
+                nextLayout.draw(g, nextPosition, verticalPos);
+            }
+            Rectangle2D layoutBounds = nextLayout.getBounds();
+            paragraphBounds.add(new Rectangle2D.Double(layoutBounds.getX() + nextPosition,
+                    layoutBounds.getY() + verticalPos,
+                    layoutBounds.getWidth(),
+                    layoutBounds.getHeight()));
+        }
+    }
+
     @Override
     protected void drawFill(Graphics2D g) {
         g.fill(bounds);
