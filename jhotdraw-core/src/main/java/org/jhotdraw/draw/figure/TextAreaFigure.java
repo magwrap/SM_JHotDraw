@@ -166,13 +166,13 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
     }
 
     private static class LineLayoutResult {
-        final List<TextLayout> layouts;
-        final List<Float> penPositions;
+        final java.util.List<TextLayout> layouts;
+        final java.util.List<Float> penPositions;
         final float maxAscent;
         final float maxDescent;
         final int currentTab;
 
-        LineLayoutResult(List<TextLayout> layouts, List<Float> penPositions, float maxAscent, float maxDescent, int currentTab) {
+        LineLayoutResult(java.util.List<TextLayout> layouts, java.util.List<Float> penPositions, float maxAscent, float maxDescent, int currentTab) {
             this.layouts = layouts;
             this.penPositions = penPositions;
             this.maxAscent = maxAscent;
@@ -248,14 +248,14 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         }
     }
 
-    private void applyAlignment(TextAlignment alignment, List<TextLayout> layouts, List<Float> penPositions, float leftMargin, float rightMargin) {
+    private void applyAlignment(TextAlignment alignment, java.util.List<TextLayout> layouts, java.util.List<Float> penPositions, float leftMargin, float rightMargin) {
         int first = 0;
         if (first == layouts.size() - 1) {
             penPositions.set(first, alignment.align(layouts.get(first), leftMargin, rightMargin));
         }
     }
 
-    private void renderOrMeasureLine(Graphics2D g, List<TextLayout> layouts, List<Float> penPositions, float verticalPos, Rectangle2D.Double paragraphBounds) {
+    private void renderOrMeasureLine(Graphics2D g, java.util.List<TextLayout> layouts, java.util.List<Float> penPositions, float verticalPos, Rectangle2D.Double paragraphBounds) {
         Iterator<TextLayout> layoutEnum = layouts.iterator();
         Iterator<Float> positionEnum = penPositions.iterator();
         while (layoutEnum.hasNext()) {
