@@ -165,6 +165,7 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         return paragraphBounds;
     }
 
+    /** Holds the result of laying out a single line of text. */
     private static class LineLayoutResult {
         final java.util.List<TextLayout> layouts;
         final java.util.List<Float> penPositions;
@@ -181,6 +182,12 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         }
     }
 
+    /**
+     * Returns the indices of all tab characters in the text.
+     * @param styledText the text to scan for tabs
+     * @param tabCount the expected number of tabs
+     * @return array of tab indices, with the last element set to the end of the text
+     */
     private int[] extractTabLocations(AttributedCharacterIterator styledText, int tabCount) {
         int[] tabLocations = new int[tabCount + 1];
         int i = 0;
@@ -193,6 +200,18 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         return tabLocations;
     }
 
+    /**
+     * Breaks the paragraph into lines using the given measurer.
+     * @param measurer the line break measurer
+     * @param leftMargin the left margin
+     * @param rightMargin the right margin
+     * @param tabStops the tab stop positions
+     * @param tabLocations the tab character indices
+     * @param verticalPos the current vertical position
+     * @param maxVerticalPos the maximum vertical position
+     * @param currentTab the current tab index
+     * @return the layout result containing lines and metrics
+     */
     private LineLayoutResult layoutLines(LineBreakMeasurer measurer, float leftMargin, float rightMargin, float[] tabStops, int[] tabLocations, float verticalPos, float maxVerticalPos, int currentTab) {
         boolean lineContainsText = false;
         boolean lineComplete = false;
@@ -236,6 +255,10 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         return new LineLayoutResult(layouts, penPositions, maxAscent, maxDescent, currentTab);
     }
 
+    /**
+     * Returns the alignment strategy for the current text alignment attribute.
+     * @return the appropriate TextAlignment strategy
+     */
     private TextAlignment getTextAlignment() {
         switch (get(TEXT_ALIGNMENT)) {
             case TRAILING:
@@ -248,6 +271,14 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         }
     }
 
+    /**
+     * Adjusts the horizontal position of the line according to the alignment strategy.
+     * @param alignment the alignment strategy
+     * @param layouts the text layouts for the line
+     * @param penPositions the horizontal positions of each layout
+     * @param leftMargin the left margin
+     * @param rightMargin the right margin
+     */
     private void applyAlignment(TextAlignment alignment, java.util.List<TextLayout> layouts, java.util.List<Float> penPositions, float leftMargin, float rightMargin) {
         int first = 0;
         if (first == layouts.size() - 1) {
@@ -255,6 +286,14 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         }
     }
 
+    /**
+     * Renders the line if a Graphics2D is provided, or measures its bounds.
+     * @param g the graphics context, or null for measurement only
+     * @param layouts the text layouts to render or measure
+     * @param penPositions the horizontal positions of each layout
+     * @param verticalPos the vertical position of the line
+     * @param paragraphBounds the bounds to accumulate
+     */
     private void renderOrMeasureLine(Graphics2D g, java.util.List<TextLayout> layouts, java.util.List<Float> penPositions, float verticalPos, Rectangle2D.Double paragraphBounds) {
         Iterator<TextLayout> layoutEnum = layouts.iterator();
         Iterator<Float> positionEnum = penPositions.iterator();
@@ -272,10 +311,12 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         }
     }
 
+    /** Strategy for aligning a line of text within its margins. */
     private interface TextAlignment {
         float align(TextLayout layout, float leftMargin, float rightMargin);
     }
 
+    /** Aligns text to the left (leading) margin. */
     private static class LeadingAlignment implements TextAlignment {
         @Override
         public float align(TextLayout layout, float leftMargin, float rightMargin) {
@@ -283,6 +324,7 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         }
     }
 
+    /** Aligns text to the right (trailing) margin. */
     private static class TrailingAlignment implements TextAlignment {
         @Override
         public float align(TextLayout layout, float leftMargin, float rightMargin) {
@@ -290,6 +332,7 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
         }
     }
 
+    /** Centers text between the left and right margins. */
     private static class CenterAlignment implements TextAlignment {
         @Override
         public float align(TextLayout layout, float leftMargin, float rightMargin) {
