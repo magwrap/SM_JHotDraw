@@ -259,7 +259,7 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
      * Returns the alignment strategy for the current text alignment attribute.
      * @return the appropriate TextAlignment strategy
      */
-    private TextAlignment getTextAlignment() {
+    TextAlignment getTextAlignment() {
         switch (get(TEXT_ALIGNMENT)) {
             case TRAILING:
                 return new TrailingAlignment();
@@ -312,7 +312,7 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
     }
 
     /** Strategy for aligning a line of text within its margins. */
-    private interface TextAlignment {
+    interface TextAlignment {
         float align(TextLayout layout, float leftMargin, float rightMargin);
     }
 
