@@ -8,6 +8,7 @@
  */
 package org.jhotdraw.action.edit;
 
+import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
@@ -78,6 +79,21 @@ public abstract class AbstractSelectionAction extends AbstractAction {
             };
             target.addPropertyChangeListener(new WeakPropertyChangeListener(propertyHandler));
         }
+    }
+
+    /**
+     * Returns the effective target component: the fixed target if set, otherwise
+     * the current permanent keyboard focus owner if it is a JComponent.
+     */
+    protected JComponent getTargetComponent() {
+        if (target != null) {
+            return target;
+        }
+        KeyboardFocusManager fm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        if (fm.getPermanentFocusOwner() instanceof JComponent) {
+            return (JComponent) fm.getPermanentFocusOwner();
+        }
+        return null;
     }
 
     protected void updateEnabled() {
