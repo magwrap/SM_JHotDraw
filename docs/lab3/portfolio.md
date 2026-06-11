@@ -2,7 +2,12 @@
 
 ## Part 1: Impact analysis (AnalysisLab)
 
-### Feature: copy and paste figures
+### Feature: basic editing (cut, copy, paste subfeatures)
+
+The impact analysis covers the three clipboard subfeatures (cut/copy/paste)
+of the **basic editing** feature picked in lab 2. Delete and duplicate
+subfeatures are out of scope. The three controllers share the same parent
+class (`AbstractSelectionAction`) and therefore the same impact set.
 
 Algorithm used: Fig 7.9 from [Raj13], iterative BFS starting from the initial CHANGED set.
 
