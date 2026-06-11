@@ -12,10 +12,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-/**
- * JGiven Then-stage: verifies clipboard interactions resulting from
- * copy/paste actions using Mockito verification and AssertJ assertions.
- */
 public class ThenClipboardBehavior extends Stage<ThenClipboardBehavior> {
 
     @ExpectedScenarioState
@@ -55,7 +51,6 @@ public class ThenClipboardBehavior extends Stage<ThenClipboardBehavior> {
     }
 
     public ThenClipboardBehavior export_still_occurs_despite_component_being_disabled() {
-        // JHotDraw design: copy is allowed on disabled components
         assertThat(drawingComponent.isEnabled()).isFalse();
         verify(mockTransferHandler, times(1))
                 .exportToClipboard(drawingComponent, mockClipboard, TransferHandler.COPY);

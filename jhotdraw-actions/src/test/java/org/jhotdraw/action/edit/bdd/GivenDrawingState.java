@@ -11,10 +11,6 @@ import org.mockito.Mockito;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
-/**
- * JGiven Given-stage: sets up the drawing component and clipboard state
- * for copy/paste BDD scenarios.
- */
 public class GivenDrawingState extends Stage<GivenDrawingState> {
 
     @ProvidedScenarioState

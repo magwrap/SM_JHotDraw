@@ -5,18 +5,6 @@ import org.jhotdraw.datatransfer.ClipboardUtil;
 import org.junit.After;
 import org.junit.Test;
 
-/**
- * BDD scenarios for the Copy / Paste Figures feature.
- *
- * User Stories (from Lab 2):
- *   US-1: As a drawing user, I want to copy selected figures to the clipboard
- *         so that I can reuse them without redrawing.
- *   US-2: As a drawing user, I want to paste figures from the clipboard
- *         so that I can place duplicates anywhere in my drawing.
- *
- * Scenarios are expressed in Given-When-Then form and automated via JGiven.
- * Domain assertions use AssertJ.
- */
 public class CopyPasteScenarioTest
         extends ScenarioTest<GivenDrawingState, WhenUserAction, ThenClipboardBehavior> {
 
@@ -24,8 +12,6 @@ public class CopyPasteScenarioTest
     public void resetClipboard() {
         ClipboardUtil.setClipboard(null);
     }
-
-    // ── US-1: Copy selected figures ──────────────────────────────────────────
 
     @Test
     public void copy_selected_figures_exports_them_to_clipboard() {
@@ -43,13 +29,10 @@ public class CopyPasteScenarioTest
 
     @Test
     public void copy_from_a_disabled_component_still_exports() {
-        // JHotDraw explicitly allows copy from disabled components
         given().a_disabled_drawing_component();
         when().the_user_invokes_copy();
         then().export_still_occurs_despite_component_being_disabled();
     }
-
-    // ── US-2: Paste figures from clipboard ───────────────────────────────────
 
     @Test
     public void paste_with_clipboard_content_imports_figures_into_drawing() {

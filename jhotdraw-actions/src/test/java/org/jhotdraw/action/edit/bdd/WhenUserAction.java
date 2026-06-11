@@ -7,9 +7,6 @@ import javax.swing.JPanel;
 import org.jhotdraw.action.edit.CopyAction;
 import org.jhotdraw.action.edit.PasteAction;
 
-/**
- * JGiven When-stage: represents user-initiated copy/paste interactions.
- */
 public class WhenUserAction extends Stage<WhenUserAction> {
 
     @ExpectedScenarioState
