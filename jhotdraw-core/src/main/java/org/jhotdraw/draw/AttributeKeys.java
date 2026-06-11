@@ -530,6 +530,7 @@ public class AttributeKeys {
     public static Font getPositionedFont(Figure f) {
         Font font = getFont(f);
         if (font != null && (f.get(FONT_SUPERSCRIPT) || f.get(FONT_SUBSCRIPT))) {
+            assert font.getSize2D() >= 0 : "Font size must not be negative";
             font = font.deriveFont(font.getSize2D() * 0.7f);
         }
         return font;
@@ -537,6 +538,7 @@ public class AttributeKeys {
 
     public static float getFontBaselineOffset(Figure f) {
         float fontSize = f.get(FONT_SIZE).floatValue();
+        assert fontSize >= 0 : "Font size must not be negative";
         if (f.get(FONT_SUPERSCRIPT)) {
             return -fontSize * 0.35f;
         } else if (f.get(FONT_SUBSCRIPT)) {
