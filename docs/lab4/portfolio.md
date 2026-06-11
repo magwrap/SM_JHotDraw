@@ -1,6 +1,11 @@
 # Lab 4: refactoring portfolio
 
-## Feature context: copy and paste figures
+## Feature context: basic editing (cut, copy, paste subfeatures)
+
+The refactoring targets all three clipboard subfeatures of the **basic
+editing** feature — cut, copy, paste — because the code smell is shared
+between their three controller classes (`CutAction`, `CopyAction`,
+`PasteAction`).
 
 ## Code smell: duplicated code (Fowler #1)
 
