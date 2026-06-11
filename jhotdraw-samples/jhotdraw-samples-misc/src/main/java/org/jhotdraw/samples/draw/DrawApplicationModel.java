@@ -38,6 +38,7 @@ import org.jhotdraw.draw.tool.BezierTool;
 import org.jhotdraw.draw.tool.ConnectionTool;
 import org.jhotdraw.draw.tool.CreationTool;
 import org.jhotdraw.draw.tool.ImageTool;
+import org.jhotdraw.draw.tool.PathTool;
 import org.jhotdraw.draw.tool.TextAreaCreationTool;
 import org.jhotdraw.draw.tool.TextCreationTool;
 import org.jhotdraw.gui.JFileURIChooser;
@@ -145,6 +146,7 @@ public class DrawApplicationModel extends DefaultApplicationModel {
         lc.setLiner(new CurvedLiner());
         ButtonFactory.addToolTo(tb, editor, new BezierTool(new BezierFigure()), "edit.createScribble", labels);
         ButtonFactory.addToolTo(tb, editor, new BezierTool(new BezierFigure(true)), "edit.createPolygon", labels);
+        ButtonFactory.addToolTo(tb, editor, new PathTool(new BezierFigure()), "edit.createPath", labels);
         ButtonFactory.addToolTo(tb, editor, new TextCreationTool(new TextFigure()), "edit.createText", labels);
         ButtonFactory.addToolTo(tb, editor, new TextAreaCreationTool(new TextAreaFigure()), "edit.createTextArea", labels);
         ButtonFactory.addToolTo(tb, editor, new ImageTool(new ImageFigure()), "edit.createImage", labels);
