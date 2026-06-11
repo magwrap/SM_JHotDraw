@@ -1,6 +1,13 @@
 # Lab 5: SOLID principles and Clean Architecture in JHotDraw
 
-## Case study feature: copy and paste figures
+## Case study feature: basic editing (cut, copy, paste subfeatures)
+
+The SOLID and Clean Architecture analysis below uses the **basic editing**
+feature from the course feature list as its running example, focusing on
+the three clipboard subfeatures (cut/copy/paste) this group is registered
+for. Most of the examples use `CopyAction` as the concrete reference
+class; `CutAction` and `PasteAction` follow the same patterns because all
+three are siblings under `AbstractSelectionAction`.
 
 ## Part 1: SOLID principles in JHotDraw
 
