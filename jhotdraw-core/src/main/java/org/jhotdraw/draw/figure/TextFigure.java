@@ -71,6 +71,7 @@ public class TextFigure extends AbstractAttributedDecoratedFigure
     protected void drawText(java.awt.Graphics2D g) {
         if (getText() != null || isEditable()) {
             TextLayout layout = getTextLayout();
+            float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
             Graphics2D g2 = (Graphics2D) g.create();
             try {
                 //Test if world to screen transformation mirrors the text. If so it tries to
@@ -82,7 +83,7 @@ public class TextFigure extends AbstractAttributedDecoratedFigure
                     at.translate(0, -origin.y - layout.getAscent() / 2);
                     g2.transform(at);
                 }
-                layout.draw(g2, (float) origin.x, (float) (origin.y + layout.getAscent()));
+                layout.draw(g2, (float) origin.x, (float) (origin.y + layout.getAscent() + baselineOffset));
             } finally {
                 g2.dispose();
             }
@@ -116,7 +117,7 @@ public class TextFigure extends AbstractAttributedDecoratedFigure
             }
             FontRenderContext frc = getFontRenderContext();
             HashMap<TextAttribute, Object> textAttributes = new HashMap<>();
-            textAttributes.put(TextAttribute.FONT, getFont());
+            textAttributes.put(TextAttribute.FONT, AttributeKeys.getPositionedFont(this));
             if (get(FONT_UNDERLINE)) {
                 textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
             }
@@ -128,8 +129,9 @@ public class TextFigure extends AbstractAttributedDecoratedFigure
     @Override
     public Rectangle2D.Double getBounds() {
         TextLayout layout = getTextLayout();
-        Rectangle2D.Double r = new Rectangle2D.Double(origin.x, origin.y, layout.getAdvance(),
-                layout.getAscent() + layout.getDescent());
+        float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
+        Rectangle2D.Double r = new Rectangle2D.Double(origin.x, origin.y + Math.min(0, baselineOffset), layout.getAdvance(),
+                layout.getAscent() + layout.getDescent() + Math.abs(baselineOffset));
         return r;
     }
 
@@ -154,13 +156,14 @@ public class TextFigure extends AbstractAttributedDecoratedFigure
             return getBounds();
         } else {
             TextLayout layout = getTextLayout();
+            float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
             Rectangle2D.Double r = new Rectangle2D.Double(
-                    origin.x, origin.y, layout.getAdvance(), layout.getAscent());
+                    origin.x, origin.y + Math.min(0, baselineOffset), layout.getAdvance(), layout.getAscent() + Math.abs(baselineOffset));
             Rectangle2D lBounds = layout.getBounds();
             if (!lBounds.isEmpty() && !Double.isNaN(lBounds.getX())) {
                 r.add(new Rectangle2D.Double(
                         lBounds.getX() + origin.x,
-                        (lBounds.getY() + origin.y + layout.getAscent()),
+                        (lBounds.getY() + origin.y + layout.getAscent() + baselineOffset),
                         lBounds.getWidth(),
                         lBounds.getHeight()));
             }

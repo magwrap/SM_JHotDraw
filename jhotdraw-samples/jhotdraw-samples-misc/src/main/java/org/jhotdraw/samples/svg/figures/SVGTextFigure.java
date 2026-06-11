@@ -15,6 +15,8 @@ import java.util.*;
 import org.jhotdraw.draw.*;
 import static org.jhotdraw.draw.AttributeKeys.FILL_COLOR;
 import static org.jhotdraw.draw.AttributeKeys.FONT_SIZE;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUBSCRIPT;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUPERSCRIPT;
 import static org.jhotdraw.draw.AttributeKeys.FONT_UNDERLINE;
 import static org.jhotdraw.draw.AttributeKeys.TEXT;
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
@@ -122,12 +124,13 @@ public class SVGTextFigure
             }
             FontRenderContext frc = getFontRenderContext();
             HashMap<TextAttribute, Object> textAttributes = new HashMap<TextAttribute, Object>();
-            textAttributes.put(TextAttribute.FONT, getFont());
+            textAttributes.put(TextAttribute.FONT, AttributeKeys.getPositionedFont(this));
             if (get(FONT_UNDERLINE)) {
                 textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
             }
             TextLayout textLayout = new TextLayout(text, textAttributes, frc);
-            cachedBounds.setRect(coordinates[0].x, coordinates[0].y - textLayout.getAscent(), textLayout.getAdvance(), textLayout.getAscent());
+            float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
+            cachedBounds.setRect(coordinates[0].x, coordinates[0].y - textLayout.getAscent() + baselineOffset, textLayout.getAdvance(), textLayout.getAscent() + Math.abs(baselineOffset));
             AffineTransform tx = new AffineTransform();
             tx.translate(coordinates[0].x, coordinates[0].y);
             switch (get(TEXT_ANCHOR)) {
@@ -187,13 +190,13 @@ public class SVGTextFigure
             }
             FontRenderContext frc = getFontRenderContext();
             HashMap<TextAttribute, Object> textAttributes = new HashMap<TextAttribute, Object>();
-            textAttributes.put(TextAttribute.FONT, getFont());
+            textAttributes.put(TextAttribute.FONT, AttributeKeys.getPositionedFont(this));
             if (get(FONT_UNDERLINE)) {
                 textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
             }
             TextLayout textLayout = new TextLayout(text, textAttributes, frc);
             AffineTransform tx = new AffineTransform();
-            tx.translate(coordinates[0].x, coordinates[0].y);
+            tx.translate(coordinates[0].x, coordinates[0].y + AttributeKeys.getFontBaselineOffset(this));
             switch (get(TEXT_ANCHOR)) {
                 case END:
                     tx.translate(-textLayout.getAdvance(), 0);
@@ -300,6 +303,8 @@ public class SVGTextFigure
                 || key.equals(SVGAttributeKeys.FONT_FACE)
                 || key.equals(SVGAttributeKeys.FONT_BOLD)
                 || key.equals(SVGAttributeKeys.FONT_ITALIC)
+                || key.equals(FONT_SUPERSCRIPT)
+                || key.equals(FONT_SUBSCRIPT)
                 || key.equals(SVGAttributeKeys.FONT_SIZE)) {
             invalidate();
         }

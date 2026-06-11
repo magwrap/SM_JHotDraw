@@ -255,6 +255,14 @@ public class AttributeKeys {
      */
     public static final AttributeKey<Boolean> FONT_UNDERLINE = new AttributeKey<Boolean>("fontUnderline", Boolean.class, false, false, LABELS);
     /**
+     * The value of this attribute is a Boolean object.
+     */
+    public static final AttributeKey<Boolean> FONT_SUPERSCRIPT = new AttributeKey<Boolean>("fontSuperscript", Boolean.class, false, false, LABELS);
+    /**
+     * The value of this attribute is a Boolean object.
+     */
+    public static final AttributeKey<Boolean> FONT_SUBSCRIPT = new AttributeKey<Boolean>("fontSubscript", Boolean.class, false, false, LABELS);
+    /**
      * The value of this attribute is a Liner object.
      */
     public static final AttributeKey<Liner> BEZIER_PATH_LAYOUTER = new AttributeKey<Liner>("bezierPathLayouter", Liner.class, null, true, LABELS);
@@ -344,6 +352,8 @@ public class AttributeKeys {
             FONT_BOLD,
             FONT_ITALIC,
             FONT_UNDERLINE,
+            FONT_SUPERSCRIPT,
+            FONT_SUBSCRIPT,
             BEZIER_PATH_LAYOUTER,
             END_DECORATION,
             START_DECORATION,
@@ -515,6 +525,24 @@ public class AttributeKeys {
         } else {
             return prototype.deriveFont(f.get(FONT_SIZE).floatValue());
         }
+    }
+
+    public static Font getPositionedFont(Figure f) {
+        Font font = getFont(f);
+        if (font != null && (f.get(FONT_SUPERSCRIPT) || f.get(FONT_SUBSCRIPT))) {
+            font = font.deriveFont(font.getSize2D() * 0.7f);
+        }
+        return font;
+    }
+
+    public static float getFontBaselineOffset(Figure f) {
+        float fontSize = f.get(FONT_SIZE).floatValue();
+        if (f.get(FONT_SUPERSCRIPT)) {
+            return -fontSize * 0.35f;
+        } else if (f.get(FONT_SUBSCRIPT)) {
+            return fontSize * 0.25f;
+        }
+        return 0f;
     }
 
     public static int getFontStyle(Figure f) {

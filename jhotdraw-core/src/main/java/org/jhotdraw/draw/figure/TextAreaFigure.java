@@ -83,8 +83,9 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
     @Override
     protected void drawText(Graphics2D g) {
         if (getText() != null || isEditable()) {
-            Font font = getFont();
+            Font font = AttributeKeys.getPositionedFont(this);
             boolean isUnderlined = get(FONT_UNDERLINE);
+            float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
             Insets2D.Double insets = getInsets();
             Rectangle2D.Double textRect = new Rectangle2D.Double(
                     bounds.x + insets.left,
@@ -93,7 +94,7 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
                     bounds.height - insets.top - insets.bottom);
             float leftMargin = (float) textRect.x;
             float rightMargin = (float) Math.max(leftMargin + 1, textRect.x + textRect.width + 1);
-            float verticalPos = (float) textRect.y;
+            float verticalPos = (float) textRect.y + baselineOffset;
             float maxVerticalPos = (float) (textRect.y + textRect.height);
             if (leftMargin < rightMargin) {
                 //float tabWidth = (float) (getTabSize() * g.getFontMetrics(font).charWidth('m'));
@@ -477,11 +478,12 @@ public class TextAreaFigure extends AbstractAttributedDecoratedFigure implements
     public Dimension2DDouble getPreferredTextSize(double maxWidth) {
         Rectangle2D.Double textRect = new Rectangle2D.Double();
         if (getText() != null) {
-            Font font = getFont();
+            Font font = AttributeKeys.getPositionedFont(this);
             boolean isUnderlined = get(FONT_UNDERLINE);
+            float baselineOffset = AttributeKeys.getFontBaselineOffset(this);
             float leftMargin = 0;
             float rightMargin = (float) maxWidth - 1;
-            float verticalPos = 0;
+            float verticalPos = baselineOffset;
             float maxVerticalPos = Float.MAX_VALUE;
             if (leftMargin < rightMargin) {
                 float tabWidth = (float) (getTabSize() * font.getStringBounds("m", getFontRenderContext()).getWidth());

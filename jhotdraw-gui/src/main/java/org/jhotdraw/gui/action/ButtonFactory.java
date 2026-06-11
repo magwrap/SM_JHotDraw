@@ -53,6 +53,8 @@ import static org.jhotdraw.draw.AttributeKeys.FILL_UNDER_STROKE;
 import static org.jhotdraw.draw.AttributeKeys.FONT_BOLD;
 import static org.jhotdraw.draw.AttributeKeys.FONT_FACE;
 import static org.jhotdraw.draw.AttributeKeys.FONT_ITALIC;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUBSCRIPT;
+import static org.jhotdraw.draw.AttributeKeys.FONT_SUPERSCRIPT;
 import static org.jhotdraw.draw.AttributeKeys.FONT_UNDERLINE;
 import static org.jhotdraw.draw.AttributeKeys.START_DECORATION;
 import static org.jhotdraw.draw.AttributeKeys.STROKE_CAP;
@@ -99,6 +101,7 @@ import org.jhotdraw.draw.event.SelectionComponentRepainter;
 import org.jhotdraw.draw.event.ToolAdapter;
 import org.jhotdraw.draw.event.ToolEvent;
 import org.jhotdraw.draw.event.ToolListener;
+import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.draw.tool.DelegationSelectionTool;
 import org.jhotdraw.draw.tool.Tool;
 import org.jhotdraw.geom.DoubleStroke;
@@ -1534,6 +1537,8 @@ public class ButtonFactory {
         bar.add(createFontStyleBoldButton(editor));
         bar.add(createFontStyleItalicButton(editor));
         bar.add(createFontStyleUnderlineButton(editor));
+        bar.add(createFontStyleSuperscriptButton(editor));
+        bar.add(createFontStyleSubscriptButton(editor));
     }
 
     public static JPopupButton createFontButton(DrawingEditor editor) {
@@ -1581,16 +1586,9 @@ public class ButtonFactory {
 
     public static JButton createFontStyleBoldButton(DrawingEditor editor,
             ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
-        JButton btn;
-        btn = new JButton();
-        labels.configureToolBarButton(btn, "attribute.fontStyle.bold");
-        btn.setFocusable(false);
-        AbstractAction a = new AttributeToggler<>(editor,
-                FONT_BOLD, Boolean.TRUE, Boolean.FALSE,
+        return createFontStyleButton(editor, labels,
+                FONT_BOLD, "attribute.fontStyle.bold",
                 new StyledEditorKit.BoldAction());
-        a.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString("attribute.fontStyle.bold.text"));
-        btn.addActionListener(a);
-        return btn;
     }
 
     public static JButton createFontStyleItalicButton(DrawingEditor editor) {
@@ -1606,16 +1604,9 @@ public class ButtonFactory {
 
     public static JButton createFontStyleItalicButton(DrawingEditor editor,
             ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
-        JButton btn;
-        btn = new JButton();
-        labels.configureToolBarButton(btn, "attribute.fontStyle.italic");
-        btn.setFocusable(false);
-        AbstractAction a = new AttributeToggler<>(editor,
-                FONT_ITALIC, Boolean.TRUE, Boolean.FALSE,
+        return createFontStyleButton(editor, labels,
+                FONT_ITALIC, "attribute.fontStyle.italic",
                 new StyledEditorKit.BoldAction());
-        a.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString("attribute.fontStyle.italic.text"));
-        btn.addActionListener(a);
-        return btn;
     }
 
     public static JButton createFontStyleUnderlineButton(DrawingEditor editor) {
@@ -1631,14 +1622,96 @@ public class ButtonFactory {
 
     public static JButton createFontStyleUnderlineButton(DrawingEditor editor,
             ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
-        JButton btn;
-        btn = new JButton();
-        labels.configureToolBarButton(btn, "attribute.fontStyle.underline");
+        return createFontStyleButton(editor, labels,
+                FONT_UNDERLINE, "attribute.fontStyle.underline",
+                new StyledEditorKit.BoldAction());
+    }
+
+    public static JButton createFontStyleSuperscriptButton(DrawingEditor editor) {
+        return createFontStyleSuperscriptButton(editor,
+                ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels"));
+    }
+
+    public static JButton createFontStyleSuperscriptButton(DrawingEditor editor,
+            ResourceBundleUtil labels) {
+        return createFontStyleSuperscriptButton(editor,
+                labels, new LinkedList<>());
+    }
+
+    public static JButton createFontStyleSuperscriptButton(DrawingEditor editor,
+            ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
+        return createFontPositionButton(editor, labels,
+                FONT_SUPERSCRIPT, FONT_SUBSCRIPT,
+                "attribute.fontStyle.superscript");
+    }
+
+    public static JButton createFontStyleSubscriptButton(DrawingEditor editor) {
+        return createFontStyleSubscriptButton(editor,
+                ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels"));
+    }
+
+    public static JButton createFontStyleSubscriptButton(DrawingEditor editor,
+            ResourceBundleUtil labels) {
+        return createFontStyleSubscriptButton(editor,
+                labels, new LinkedList<>());
+    }
+
+    public static JButton createFontStyleSubscriptButton(DrawingEditor editor,
+            ResourceBundleUtil labels, java.util.List<Disposable> dsp) {
+        return createFontPositionButton(editor, labels,
+                FONT_SUBSCRIPT, FONT_SUPERSCRIPT,
+                "attribute.fontStyle.subscript");
+    }
+
+    private static JButton createFontPositionButton(final DrawingEditor editor,
+            final ResourceBundleUtil labels,
+            final AttributeKey<Boolean> key,
+            final AttributeKey<Boolean> oppositeKey,
+            final String labelKey) {
+        JButton btn = new JButton();
+        labels.configureToolBarButton(btn, labelKey);
+        btn.setFocusable(false);
+        AbstractAction a = new AbstractAction() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                HashMap<AttributeKey<?>, Object> attributes = new HashMap<>();
+                attributes.put(key, !isAttributeActive(editor, key));
+                attributes.put(oppositeKey, Boolean.FALSE);
+                AttributeAction action = new AttributeAction(editor,
+                        attributes,
+                        labels.getString(labelKey + ".text"),
+                        null);
+                action.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString(labelKey + ".text"));
+                action.actionPerformed(evt);
+            }
+        };
+        btn.addActionListener(a);
+        return btn;
+    }
+
+    private static boolean isAttributeActive(DrawingEditor editor, AttributeKey<Boolean> key) {
+        DrawingView view = editor.getActiveView();
+        if (view != null && !view.getSelectedFigures().isEmpty()) {
+            Figure figure = view.getSelectedFigures().iterator().next();
+            return Boolean.TRUE.equals(figure.get(key));
+        }
+        return Boolean.TRUE.equals(editor.getDefaultAttribute(key));
+    }
+
+    private static JButton createFontStyleButton(DrawingEditor editor,
+            ResourceBundleUtil labels,
+            AttributeKey<Boolean> key,
+            String labelKey,
+            Action compatibleTextAction) {
+        JButton btn = new JButton();
+        labels.configureToolBarButton(btn, labelKey);
         btn.setFocusable(false);
         AbstractAction a = new AttributeToggler<>(editor,
-                FONT_UNDERLINE, Boolean.TRUE, Boolean.FALSE,
-                new StyledEditorKit.BoldAction());
-        a.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString("attribute.fontStyle.underline.text"));
+                key, Boolean.TRUE, Boolean.FALSE,
+                compatibleTextAction);
+        a.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY, labels.getString(labelKey + ".text"));
         btn.addActionListener(a);
         return btn;
     }
