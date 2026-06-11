@@ -12,11 +12,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for PasteAction. Verify that the paste operation reads from
- * the clipboard and delegates to the component's TransferHandler, and that
- * it correctly guards against disabled components and empty clipboards.
- */
 public class PasteActionTest {
 
     private Clipboard mockClipboard;
@@ -41,16 +36,12 @@ public class PasteActionTest {
         ClipboardUtil.setClipboard(null);
     }
 
-    // --- invariant / ID check ---
-
     @Test
     public void testActionId_isEditPaste() {
         assert PasteAction.ID != null && !PasteAction.ID.isEmpty()
                 : "PasteAction.ID must not be null or empty";
         assertEquals("edit.paste", PasteAction.ID);
     }
-
-    // --- best-case scenarios ---
 
     @Test
     public void testActionPerformed_enabledTargetWithClipboardContent_callsImportData() {
@@ -70,11 +61,8 @@ public class PasteActionTest {
         assertTrue(action.isEnabled());
     }
 
-    // --- boundary cases ---
-
     @Test
     public void testActionPerformed_disabledTarget_doesNotImport() {
-        // Boundary: PasteAction guards with "c.isEnabled()"
         targetPanel.setEnabled(false);
         PasteAction action = new PasteAction(targetPanel);
         ActionEvent event = new ActionEvent(targetPanel, ActionEvent.ACTION_PERFORMED, "paste");
@@ -86,7 +74,6 @@ public class PasteActionTest {
 
     @Test
     public void testActionPerformed_nullClipboardContent_doesNotImport() {
-        // Boundary: clipboard is empty (null Transferable) → importData must not be called
         when(mockClipboard.getContents(targetPanel)).thenReturn(null);
         PasteAction action = new PasteAction(targetPanel);
         ActionEvent event = new ActionEvent(targetPanel, ActionEvent.ACTION_PERFORMED, "paste");
@@ -94,13 +81,11 @@ public class PasteActionTest {
         action.actionPerformed(event);
 
         verifyNoInteractions(mockTransferHandler);
-        // Java assertion: null transferable must never reach importData
         assert true : "paste with null transferable must not call importData";
     }
 
     @Test
     public void testActionPerformed_nullTargetAndNoFocusOwner_doesNotThrow() {
-        // Boundary: null target + headless (no focus owner) → c stays null → no-op
         PasteAction action = new PasteAction();
         ActionEvent event = new ActionEvent(new Object(), ActionEvent.ACTION_PERFORMED, "paste");
 
@@ -119,11 +104,9 @@ public class PasteActionTest {
 
     @Test
     public void testUpdateEnabled_withNullTarget_actionRemainsDefaultEnabled() {
-        // PasteAction.updateEnabled() only acts when target != null
         PasteAction action = new PasteAction(null);
         boolean stateBefore = action.isEnabled();
         action.updateEnabled();
-        // State is unchanged (no-op when target is null)
         assertEquals(stateBefore, action.isEnabled());
     }
 }

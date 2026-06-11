@@ -8,22 +8,16 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- * Unit tests for AbstractSelectionAction. Cover the enable/disable logic for the
- * copy/paste/cut family of editing actions.
- */
 public class AbstractSelectionActionTest {
 
-    /** Minimal concrete subclass. */
     private static class ConcreteSelectionAction extends AbstractSelectionAction {
         ConcreteSelectionAction(javax.swing.JComponent target) {
             super(target);
         }
         @Override
-        public void actionPerformed(ActionEvent evt) { /* no-op */ }
+        public void actionPerformed(ActionEvent evt) {}
     }
 
-    /** JPanel that also implements EditableComponent for controlled selection-state tests. */
     private static class EditablePanel extends JPanel implements EditableComponent {
         private final boolean selectionEmpty;
         EditablePanel(boolean selectionEmpty) { this.selectionEmpty = selectionEmpty; }
@@ -41,8 +35,6 @@ public class AbstractSelectionActionTest {
         System.setProperty("java.awt.headless", "true");
     }
 
-    // --- best-case scenarios ---
-
     @Test
     public void testUpdateEnabled_enabledNonEditableTarget_enablesAction() {
         JPanel panel = new JPanel();
@@ -54,14 +46,12 @@ public class AbstractSelectionActionTest {
 
     @Test
     public void testUpdateEnabled_editableComponentNonEmptySelection_enablesAction() {
-        EditablePanel panel = new EditablePanel(false); // non-empty selection
+        EditablePanel panel = new EditablePanel(false);
         panel.setEnabled(true);
         ConcreteSelectionAction action = new ConcreteSelectionAction(panel);
         action.updateEnabled();
         assertTrue(action.isEnabled());
     }
-
-    // --- boundary cases ---
 
     @Test
     public void testUpdateEnabled_disabledTarget_disablesAction() {
@@ -74,7 +64,7 @@ public class AbstractSelectionActionTest {
 
     @Test
     public void testUpdateEnabled_editableComponentEmptySelection_disablesAction() {
-        EditablePanel panel = new EditablePanel(true); // empty selection
+        EditablePanel panel = new EditablePanel(true);
         panel.setEnabled(true);
         ConcreteSelectionAction action = new ConcreteSelectionAction(panel);
         action.updateEnabled();
@@ -83,18 +73,14 @@ public class AbstractSelectionActionTest {
 
     @Test
     public void testUpdateEnabled_nullTarget_doesNotThrow() {
-        // Boundary: null target, updateEnabled() is documented as a no-op
         ConcreteSelectionAction action = new ConcreteSelectionAction(null);
-        action.updateEnabled(); // must not throw
+        action.updateEnabled();
     }
-
-    // --- invariant assertions ---
 
     @Test
     public void testConstructor_nonNullTarget_setsTargetField() {
         JPanel panel = new JPanel();
         ConcreteSelectionAction action = new ConcreteSelectionAction(panel);
-        // Java assertion: target invariant (active when JVM is run with -ea)
         assert action.target != null : "target must not be null after construction with non-null argument";
         assertSame(panel, action.target);
     }

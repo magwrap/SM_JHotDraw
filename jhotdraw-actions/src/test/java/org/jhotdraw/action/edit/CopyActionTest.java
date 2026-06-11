@@ -12,10 +12,6 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for CopyAction. Verify that the copy operation correctly
- * delegates to the component's TransferHandler.
- */
 public class CopyActionTest {
 
     private Clipboard mockClipboard;
@@ -25,7 +21,6 @@ public class CopyActionTest {
     @Before
     public void setUp() {
         System.setProperty("java.awt.headless", "true");
-        // Inject a mock clipboard so ClipboardUtil never hits the OS clipboard
         mockClipboard = mock(Clipboard.class);
         ClipboardUtil.setClipboard(mockClipboard);
         mockTransferHandler = mock(TransferHandler.class);
@@ -38,17 +33,12 @@ public class CopyActionTest {
         ClipboardUtil.setClipboard(null);
     }
 
-    // --- invariant / ID check ---
-
     @Test
     public void testActionId_isEditCopy() {
-        // Java assertion: static ID must never change
         assert CopyAction.ID != null && !CopyAction.ID.isEmpty()
                 : "CopyAction.ID must not be null or empty";
         assertEquals("edit.copy", CopyAction.ID);
     }
-
-    // --- best-case scenarios ---
 
     @Test
     public void testActionPerformed_withExplicitTarget_callsExportToClipboard() {
@@ -69,16 +59,12 @@ public class CopyActionTest {
 
         action.actionPerformed(event);
 
-        // Verify COPY constant is used, not MOVE
         verify(mockTransferHandler).exportToClipboard(
                 eq(targetPanel), eq(mockClipboard), eq(TransferHandler.COPY));
     }
 
-    // --- boundary cases ---
-
     @Test
     public void testActionPerformed_withDisabledTarget_stillExports() {
-        // Boundary: source code comment says "copying is allowed for disabled components"
         targetPanel.setEnabled(false);
         CopyAction action = new CopyAction(targetPanel);
         ActionEvent event = new ActionEvent(targetPanel, ActionEvent.ACTION_PERFORMED, "copy");
@@ -91,13 +77,11 @@ public class CopyActionTest {
 
     @Test
     public void testActionPerformed_withNullTargetAndNoFocusOwner_doesNotCallExport() {
-        // Boundary: no explicit target, headless env has no focus owner → c stays null → no-op
-        CopyAction action = new CopyAction(); // null-target constructor
+        CopyAction action = new CopyAction();
         ActionEvent event = new ActionEvent(new Object(), ActionEvent.ACTION_PERFORMED, "copy");
 
         action.actionPerformed(event);
 
-        // Java assertion: in headless mode with no focus owner, export must not be attempted
         assert true : "actionPerformed with null effective target must not throw";
         verifyNoInteractions(mockTransferHandler);
     }
