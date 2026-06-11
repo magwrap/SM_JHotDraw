@@ -81,10 +81,6 @@ public abstract class AbstractSelectionAction extends AbstractAction {
         }
     }
 
-    /**
-     * Returns the effective target component: the fixed target if set, otherwise
-     * the current permanent keyboard focus owner if it is a JComponent.
-     */
     protected JComponent getTargetComponent() {
         if (target != null) {
             return target;
