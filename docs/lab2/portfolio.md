@@ -2,13 +2,34 @@
 
 ## Part 1: Change request (ChangeReqLab)
 
-### Selected feature: copy and paste figures
+### Selected feature: basic editing (cut, copy, paste subfeatures)
 
-**User story**
+From the course feature list, the **basic editing** feature was selected.
+This group is registered for the three clipboard subfeatures marked with
+1 in the feature list: **cut**, **copy**, **paste**. The remaining basic
+editing subfeatures (delete, duplicate; marked 2) are taken by another
+group and are out of scope.
+
+**User stories**
+
+*US-1 Copy*
 
 > As a graphic designer using the JHotDraw SVG editor,
-> I want to copy selected figures to the clipboard and paste them back into the drawing,
-> so I can duplicate or reuse shapes without redrawing them.
+> I want to copy selected figures to the clipboard,
+> so I can duplicate or reuse them without redrawing.
+
+*US-2 Paste*
+
+> As a graphic designer using the JHotDraw SVG editor,
+> I want to paste figures from the clipboard into the drawing,
+> so I can place duplicates anywhere in the drawing.
+
+*US-3 Cut*
+
+> As a graphic designer using the JHotDraw SVG editor,
+> I want to cut selected figures (copy them to the clipboard and remove
+> them from the drawing in one action),
+> so I can move them somewhere else without doing two separate steps.
 
 **Acceptance criteria**
 
@@ -16,7 +37,8 @@
 - The selected figures end up on the system clipboard.
 - User can invoke Paste (Ctrl+V or Edit > Paste) to insert the clipboard figures into the drawing.
 - Pasted figures appear slightly offset from the originals so they are visually distinct.
-- Cut (Ctrl+X) removes the selected figures and places them on the clipboard.
+- Cut (Ctrl+X or Edit > Cut) removes the selected figures and places them on the clipboard in one action.
+- Copy is allowed on a disabled component (documented JHotDraw behaviour); paste on a disabled component is a no-op; paste from an empty clipboard is a no-op.
 
 ## Part 2: Concept location (CLLab)
 
