@@ -6,3 +6,6 @@ nb-configuration.xml
 *.ftf
 /jhotdraw-samples/jhotdraw-samples-misc/nbproject/
 *.iml
+.opencode
+/report
+/labs
